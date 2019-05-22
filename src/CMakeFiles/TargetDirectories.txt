@@ -1,0 +1,4 @@
+/home/user1/Udacity/C++/openstreetmap/src/CMakeFiles/edit_cache.dir
+/home/user1/Udacity/C++/openstreetmap/src/CMakeFiles/Project.dir
+/home/user1/Udacity/C++/openstreetmap/src/CMakeFiles/rebuild_cache.dir
+/home/user1/Udacity/C++/openstreetmap/src/CMakeFiles/route_planner.dir

@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/Project.dir/main.o CMakeFiles/Project.dir/model.o CMakeFiles/Project.dir/render.o CMakeFiles/Project.dir/route_model.o CMakeFiles/Project.dir/route_planner.o  -o Project -lio2d::io2d -lpugixml -lpthread 
