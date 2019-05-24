@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <io2d.h>
+#include <stdio.h> // required for fflush
 #include "route_model.h"
 #include "render.h"
 #include "route_planner.h"
@@ -25,6 +26,36 @@ static std::optional<std::vector<std::byte>> ReadFile(const std::string &path)
     if( contents.empty() )
         return std::nullopt;
     return std::move(contents);
+}
+
+//----------------------
+// reusable function 
+// to process user inputs
+//----------------------
+void getinput(const std::string name, float &input, int min, int max)
+{
+    bool keeptrying = false;
+    do
+    {
+        std::cout << name << ":";
+        std::cin >> input;
+        // std::cout << std::cin.fail() << "\n";
+        if (std::cin.fail())
+        {
+            std::cout << name << " is not a number! Try again.\n";
+            keeptrying = true;
+            std::cin.clear();
+            char buf[BUFSIZ];
+            std::cin >> buf;
+        }
+        else
+        {
+            keeptrying = false;
+            if (input < min || input > max)
+                std::cout << name << " is out of bounds.\n";
+        }
+    }
+    while (keeptrying || (input < min || input > max));
 }
 
 int main(int argc, const char **argv)
@@ -56,47 +87,29 @@ int main(int argc, const char **argv)
 
     float start_x=-1.0, start_y=-1.0, end_x=-1.0, end_y=-1.0;
 
-    /*
     // get start_x, start_y, end_x and end_y from user input
     std::cout << "Please enter start_x, start_y, end_x and end_y each between 0 and 100\n";
 
-    while (start_x < 0 or start_x > 100)
-    {
-        std::cout << "start_x :";
-        std::cin >> start_x;
-    }
-
-    while (start_y < 0 or start_y > 100)
-    {
-        std::cout << "start_y :";
-        std::cin >> start_y;
-    }
-
-    while (end_x < 0 or end_x > 100)
-    {
-        std::cout << "end_x :";
-        std::cin >> end_x;
-    }
-
-    while (end_y < 0 or end_y > 100)
-    {
-        std::cout << "end_y :";
-        std::cin >> end_y;
-    }
-    */
+    getinput("start_x", start_x, 0, 100);
+    getinput("start_y", start_y, 0, 100);
+    getinput("end_x", end_x, 0, 100);
+    getinput("end_y", end_y, 0, 100);
 
     // Build Model.
     RouteModel model{osm_data};
 
     // Perform search and render results.
-    RoutePlanner route_planner{model, 10, 10, 90, 90};
-    // RoutePlanner route_planner{model, start_x, start_y, end_x, end_y};
+    // RoutePlanner route_planner{model, 10, 10, 90, 90};
+    RoutePlanner route_planner{model, start_x, start_y, end_x, end_y};
     
     // Call the A* search method on the route_planner
     route_planner.AStarSearch();
 
     // print the length of path
-    std::cout << "Length of Path = " << route_planner.GetDistance() << "\n";
+    std::cout << "Length of Path from ("
+        << start_x << "," << start_y << ") to ("
+        << end_x << "," << end_y << ") = "
+        << route_planner.GetDistance() << std::endl;
 
     // render the Model
     Render render{model};

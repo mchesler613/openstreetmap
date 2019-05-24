@@ -35,8 +35,8 @@ class RouteModel : public Model {
         float distance(Node n) const 
         {
             return std::sqrt(
-                std::pow(this->x - n.x, 2)+
-                std::pow(this->y - n.y, 2)
+                std::pow((x - n.x), 2)+
+                std::pow((y - n.y), 2)
                 );
         }
 
@@ -57,9 +57,10 @@ class RouteModel : public Model {
 
 
     // This variable will eventually store the path that is found by the A* search.
-    std::vector<RouteModel::Node> path;
+    std::vector<Node> path;
 
-    std::vector<RouteModel::Node> & SNodes() { return m_Nodes; }
+    // std::vector<RouteModel::Node> & SNodes() { return m_Nodes; }
+    auto & SNodes() { return m_Nodes; }
 
 
     auto & GetNodeToRoadMap() { return node_to_road;}
@@ -72,7 +73,7 @@ class RouteModel : public Model {
     void CreateNodeToRoadHashmap();
 
     // store all the nodes from the Open Street Map data
-    std::vector<RouteModel::Node> m_Nodes;
+    std::vector<Node> m_Nodes;
 
     // which roads does this node belong to
     std::unordered_map<int, std::vector<const Model::Road *>> node_to_road;

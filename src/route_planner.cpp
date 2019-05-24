@@ -14,6 +14,9 @@ RoutePlanner::RoutePlanner(RouteModel &model, float start_x, float start_y, floa
 
     start_node = &m_Model.FindClosestNode(start_x, start_y);    
     end_node = &m_Model.FindClosestNode(end_x, end_y);    
+
+    //std::cout << "start_node = ( " << start_node->x << "," << start_node->y << ")\n";
+    //std::cout << "end_node = ( " << end_node->x << "," << end_node->y << ")\n";
 }
 
 
@@ -35,32 +38,35 @@ void RoutePlanner::AStarSearch()
     // initialize currnode to nullptr
     RouteModel::Node *currnode = nullptr;
 
-    std::cout << "Size of open_list" << open_list.size() << "\n";
+    //std::cout << "AStarSearch()\n";
+    //std::cout << "AStarSearch: Before: Size of open_list = " << open_list.size() << "\n";
 
     // while the open_list is not empty, traverse each node
     while (open_list.size() > 0)
     {
+
         // get the best node in the open_list that is closest to end_node
         currnode = NextNode();
 
+        //std::cout << "AStarSearch: After NextNode(): Size of open_list = " << open_list.size() << "\n";
+        //std::cout << "currnode->distance(*end_node) = " << currnode->distance(*end_node) << "\n";
+
         // if we have reached our destination end_node
-        if (!currnode->distance(*end_node))
+        if (currnode->distance(*end_node) == 0)
         {
             // construct final path with currnode
             // set m_Model.path with results
             m_Model.path = ConstructFinalPath(currnode);
 
+            //std::cout << "m_Model.path.size() = " << m_Model.path.size() << "\n";
+
             // exit
             return;
         }
-        else
-        {
-            // add neighbors with currnode
-            AddNeighbors(currnode);
-        }
+
+        // add neighbors with currnode
+        AddNeighbors(currnode);
     }
-    /*
-    */
     return;
 }
 
@@ -74,6 +80,9 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *currnode)
     // populate currnode's neighbors vector
     currnode->FindNeighbors();
 
+    //std::cout << "AddNeighbors::currnode->neighbors = " << currnode->neighbors.size() << "\n";
+    //std::cout << "before: open_list.size = " << open_list.size() << "\n";
+
     for (RouteModel::Node *neighbor : currnode->neighbors)
     {
         // set the neighbor's parent to current_node
@@ -85,25 +94,27 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *currnode)
         // set neighbor's h_value = CalculateHValue
         neighbor->h_value = CalculateHValue(neighbor);
 
+        //std::cout << "neighbor g_value=" << neighbor->g_value <<"\n";
+        //std::cout << "neighbor h_value=" << neighbor->h_value <<"\n";
+
         // push neighbor to back of open_list
         open_list.push_back(neighbor);
 
         // mark neighbor as visited
         neighbor->visited = true;
+
+        //std::cout << "after: open_list.size = " << open_list.size() << "\n";
     }
 }
 
-
-bool compare(RouteModel::Node *a, RouteModel::Node *b)
-{
-    return (a->h_value + a->g_value < b->h_value + b->g_value);
-}
 
 // get the next closest node in the open_list
 RouteModel::Node * RoutePlanner::NextNode()
 {
     // sort the open_list based on the f_value=h_value+g_value
-    std::sort(open_list.begin(), open_list.end(), compare);
+    std::sort(open_list.begin(), open_list.end(), [](const auto & _1st, const auto & _2nd) {
+        return _1st->h_value + _1st->g_value < _2nd->h_value + _2nd->g_value;
+    });
 
     // create a copy of the pointer to the Node with lowest f_value
     RouteModel::Node *lowest_node = open_list.front();
@@ -133,7 +144,7 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
         path_found.push_back(*current_node);
 
         // compute the distance between current_node and its parent node
-        distance += current_node->distance(*(current_node->parent));
+        distance += current_node->distance(*current_node->parent);
 
         // update current_node to its parent
         current_node = current_node->parent;

@@ -9,6 +9,7 @@ RouteModel::RouteModel(const std::vector<std::byte> &xml) : Model(xml) {
     for (Model::Node node : this->Nodes())
     {
         m_Nodes.push_back(Node(counter, this, node));
+        counter++;
     }
 
     CreateNodeToRoadHashmap();
@@ -48,23 +49,17 @@ void RouteModel::CreateNodeToRoadHashmap()
 //----------------------------------------
 void RouteModel::Node::FindNeighbors()
 {
-    // Udacity's code:
     for (auto &road : parent_model->node_to_road[this->index])
-    // my code:
-    // for (const Model::Road *road : parent_model->node_to_road[this->index])
     {
         RouteModel::Node *closestnode = this->FindNeighbor(parent_model->Ways()[road->way].nodes);
 
         if (closestnode != nullptr)
         {
-            // My code:
             this->neighbors.push_back(closestnode);
-
-            // Udacity's code
-            // this->neighbors.emplace_back(closestnode);
         }
     }
 }
+
 
 //----------------------------------------
 // Find the closest Node based on (x,y) location
@@ -80,7 +75,6 @@ RouteModel::Node & RouteModel::FindClosestNode(float x, float y)
     float dist;
     int closest_idx;
 
-    // const std::vector<Model::Road> roads = Roads();
     for (const Model::Road &road : Roads())
     {
         if (road.type != Model::Road::Type::Footway)
@@ -111,7 +105,6 @@ RouteModel::Node * RouteModel::Node::FindNeighbor(std::vector<int> node_indices)
     Node *closest_node = nullptr;
     Node node;
 
-
     for (int node_index : node_indices)
     {
        // retrieve the current Node object from the index
@@ -119,15 +112,16 @@ RouteModel::Node * RouteModel::Node::FindNeighbor(std::vector<int> node_indices)
 
        // if distance(this,node) is nonzero
        // and the node has not been visited
-       if (this->distance(node) != 0 && !node.visited)
+        if (this->distance(node) != 0 && !node.visited)
         {
+          
             if (closest_node == nullptr || this->distance(node) < this->distance(*closest_node))
             {
                 closest_node = &parent_model->SNodes()[node_index];
             }
+           
         }
     }
 
     return closest_node;
 }
-
