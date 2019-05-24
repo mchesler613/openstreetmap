@@ -12,7 +12,8 @@ or with SSH:
 ```
 git clone git@github.com:udacity/CppND-Route-Planning-Project.git --recurse-submodules
 ```
-
+## Installation on Ubuntu Linux 16.04
+For detailed instructions on building the prerequisite libraries for Ubuntu Linux, please refer to this fine document from classmate [Damien](https://github.com/dbecad/CppND-Route-Planning-Project/blob/master/Ubuntu16.4_Install.md).
 ## Compiling and Running
 
 ### Compiling
